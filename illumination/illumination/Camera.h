@@ -9,7 +9,7 @@ const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float ZOOM = 45.0f;
 const float SENSITIVITY = 0.2f; // 视角调整灵敏度
-const float SPEED = 2.5f; // 移动速度
+const float SPEED = 1.5f; // 移动速度
 
 enum class Projection_Type // 投影方式
 {

@@ -125,6 +125,10 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lamp.fs" />
+    <None Include="lamp.vs" />
+    <None Include="object.fs" />
+    <None Include="object.vs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

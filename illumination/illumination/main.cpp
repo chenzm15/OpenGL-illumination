@@ -23,7 +23,7 @@ const unsigned int SCR_HEIGHT = 600;
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Projection_Type::PERSPECTIVE);
 
 // lamp
-glm::vec3 lampPos(0.8f, 0.8f, -0.5f);
+glm::vec3 lampPos(0.0f, 3.8f, -3.5f);
 
 bool mousePressed = false;
 bool firstMouse = true;
@@ -80,12 +80,12 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+		/*-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
 		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
 		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
 		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
 		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,*/
 
 		-0.5f,  0.5f,  0.5f, 1.0f,  0.0f,  0.0f,
 		-0.5f,  0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
@@ -137,7 +137,14 @@ int main()
 	objShader.use();
 	objShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 	objShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	objShader.setVec3("lampPos", lampPos);
+	objShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+	objShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+	objShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	objShader.setFloat("material.shininess", 32.0f);
+	objShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+	objShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
+	objShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+	objShader.setVec3("light.position", lampPos);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
@@ -173,11 +180,11 @@ int main()
 		glm::mat4 view = camera.getViewMatrix();
 		objShader.setMat4("view", view);
 		glm::mat4 model;
-		model = glm::scale(model, glm::vec3(3.0f));
+		model = glm::scale(model, glm::vec3(10.0f));
 		objShader.setMat4("model", model);
 
 		glBindVertexArray(objVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 30);
 
 		lampShader.use();
 		lampShader.setMat4("projection", projection);
