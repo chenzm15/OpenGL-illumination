@@ -73,7 +73,7 @@
     <IncludePath>F:\glm;F:\glad\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>F:\glad\include;F:\glm;$(IncludePath)</IncludePath>
+    <IncludePath>E:\glad\include;E:\glm;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
