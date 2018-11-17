@@ -39,6 +39,12 @@
     <None Include="object.vs">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="window.vs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="window.fs">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.cpp">

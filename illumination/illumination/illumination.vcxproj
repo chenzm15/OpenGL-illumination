@@ -130,6 +130,8 @@
     <None Include="object.fs" />
     <None Include="object.vs" />
     <None Include="packages.config" />
+    <None Include="window.fs" />
+    <None Include="window.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.cpp" />

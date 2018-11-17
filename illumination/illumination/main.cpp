@@ -14,6 +14,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void processInput(GLFWwindow *window);
+unsigned int loadTexture(const char *path);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -70,7 +71,7 @@ int main()
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 
-	Shader objShader("object.vs", "object.fs"), lampShader("lamp.vs", "lamp.fs");
+	Shader objShader("object.vs", "object.fs"), lampShader("lamp.vs", "lamp.fs"), windowShader("window.vs", "window.fs");
 
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
@@ -116,6 +117,22 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f
 	};
 
+	float window_vertices[] = {
+		-0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+
+		 //0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
+		 //0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
+		 //0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
+		 //0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
+		 //0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
+		 //0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
+	};
+
 	GLuint objVAO, VBO;
 	glGenVertexArrays(1, &objVAO);
 	glBindVertexArray(objVAO);
@@ -134,6 +151,19 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), BUFFER_OFFSET(0));
 	glEnableVertexAttribArray(0);
 
+	GLuint windowVAO, windowVBO;
+	glGenVertexArrays(1, &windowVAO);
+	glBindVertexArray(windowVAO);
+	glGenBuffers(1, &windowVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, windowVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(window_vertices), window_vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 	objShader.use();
 	objShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 	objShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
@@ -145,6 +175,17 @@ int main()
 	objShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
 	objShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 	objShader.setVec3("light.position", lampPos);
+
+	unsigned int diffuseMap = loadTexture("window6.jpg");
+
+	windowShader.use();
+	windowShader.setInt("material.diffuse", 0);
+	windowShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	windowShader.setFloat("material.shininess", 64.0f);
+	windowShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+	windowShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
+	windowShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+	windowShader.setVec3("light.position", lampPos);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
@@ -186,12 +227,29 @@ int main()
 		glBindVertexArray(objVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 30);
 
+		windowShader.use();
+		windowShader.setVec3("viewPos", camera.getCameraPosition());
+
+		windowShader.setMat4("projection", projection);
+		windowShader.setMat4("view", view);
+
+		model = glm::mat4();
+		model = glm::scale(model, glm::vec3(10.0f, 4.0f, 4.0f));
+		model = glm::translate(model, glm::vec3(0.005f, 0.0f, 0.0f));
+		windowShader.setMat4("model", model);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+		glBindVertexArray(windowVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
 		lampShader.use();
 		lampShader.setMat4("projection", projection);
 		lampShader.setMat4("view", view);
 		model = glm::mat4();
 		model = glm::translate(model, lampPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		model = glm::scale(model, glm::vec3(0.2f));
 		lampShader.setMat4("model", model);
 
 		glBindVertexArray(lampVAO);
@@ -279,4 +337,42 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			firstMouse = true;
 		}
 	}
+}
+
+unsigned int loadTexture(char const * path)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+
+	int width, height, nrComponents;
+	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+	if (data)
+	{
+		GLenum format;
+		printf("%d", nrComponents);
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else
+	{
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(data);
+	}
+
+	return textureID;
 }
