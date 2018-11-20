@@ -129,6 +129,14 @@ public:
 			Zoom = 45.0f;
 	}
 
+	void switchProjectionType()
+	{
+		if (projection_type == Projection_Type::PERSPECTIVE)
+			projection_type = Projection_Type::ORTHO;
+		else
+			projection_type = Projection_Type::PERSPECTIVE;
+	}
+
 private:
 	void updateCameraVectors()
 	{
