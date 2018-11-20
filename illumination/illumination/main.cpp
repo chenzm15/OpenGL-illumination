@@ -27,7 +27,7 @@ const unsigned int SCR_HEIGHT = 900;
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Projection_Type::PERSPECTIVE);
 
 // lamp
-glm::vec3 lampPos(0.0f, 3.5f, 3.5f);
+glm::vec3 lampPos(0.0f, 3.5f, 0.1f);
 
 bool mousePressed = false;
 bool firstMouse = true;
@@ -254,7 +254,7 @@ int main()
 		glm::mat4 lightSpaceMatrix;
 		GLfloat near_plane = 1.0f, far_plane = 15.0f;
 		//lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		lightProjection = glm::perspective(90.0f, (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // Note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene.
+		lightProjection = glm::perspective(glm::radians(90.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // Note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene.
 		lightView = glm::lookAt(lampPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 		// - now render scene from light's point of view
@@ -279,7 +279,7 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 			model = glm::mat4();
-			model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::translate(model, glm::vec3(3.0f, -5.0f, -2.0f)); // translate it down so it's at the center of the scene
 			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 			simpleDepthShader.setMat4("model", model);
 			ourModel.Draw(simpleDepthShader);
@@ -348,18 +348,18 @@ int main()
 		sofaShader.setMat4("projection", projection);
 		sofaShader.setMat4("view", view);
 		model = glm::mat4();
-		model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::translate(model, glm::vec3(3.0f, -5.0f, -2.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 		sofaShader.setMat4("model", model);
 		ourModel.Draw(sofaShader);
 
 		// 3. DEBUG: visualize depth map by rendering it to plane
-		/*debugDepthQuad.use();
+		debugDepthQuad.use();
 		debugDepthQuad.setFloat("near_plane", near_plane);
 		debugDepthQuad.setFloat("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
-		RenderQuad();*/
+		//RenderQuad();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
